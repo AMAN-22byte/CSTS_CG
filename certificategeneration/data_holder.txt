@@ -1,0 +1,92 @@
+..................models.py file.................
+
+from django.db import models
+import uuid
+
+class SingleCertificate(models.Model):
+    heading = models.CharField(max_length=100)
+    certificate_about = models.TextField()
+    certificant_name = models.CharField(max_length=100)
+    date = models.DateField()
+    company_name = models.CharField(max_length=100)
+    certificate_provider_name = models.CharField(max_length=100)
+    def generate_unique_id(self):
+        return uuid.uuid4()
+
+
+..................serializer.py file.............
+
+from rest_framework import serializers
+from . models import SingleCertificate
+class SingleCertificateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SingleCertificate
+        fields = ['heading', 'certificate_about', 'certificant_name', 'date', 'company_name', 'certificate_provider_name']
+
+
+..................view for SingleCertificate..................
+@api_view(['POST'])
+def generate_single_certificate(request):
+    if request.method == 'POST':
+        serializer = SingleCertificateSerializer(data=request.data)
+        if serializer.is_valid():
+            certificate = serializer.save()
+            return Response({'id': str(certificate.id)})
+        return Response(serializer.errors, status=400)
+
+
+..................url part ..............
+from certgen.views import *
+path('api/generate_single_certificate/', generate_single_certificate, name='generate_single_certificate'),
+
+
+
+import axios from 'axios';
+
+// Function to retrieve CSRF token from cookies
+function getCookie(name) {
+    const cookieValue = document.cookie.split(';').find(cookie => cookie.trim().startsWith(name + '='));
+    if (cookieValue) {
+        return cookieValue.split('=')[1];
+    } else {
+        return null;
+    }
+}
+
+const [csrfToken, setCsrfToken] = useState('');
+
+    useEffect(() => {
+        const token = getCookie('csrftoken');
+        if (token) {
+            setCsrfToken(token);
+        }
+    }, []);
+
+const formData = {
+            heading: event.target.heading.value,
+            certificate_about: event.target.certificate_about.value,
+            certificant_name: event.target.certificant_name.value,
+            date: event.target.date.value,
+            company_name: event.target.company_name.value,
+            certificate_provider_name: event.target.certificate_provider_name.value,
+            csrfmiddlewaretoken: csrfToken // Include CSRF token in form data
+        };
+
+        try {
+            // Send POST request with CSRF token in headers
+            const response = await axios.post('/api/generate_single_certificate', formData);
+
+            // Handle response
+            console.log('Certificate generated with ID:', response.data.id);
+        } catch (error) {
+            // Handle error
+            console.error('Error generating single certificate:', error);
+        }
+
+         {/* Include CSRF token as a hidden input field */}
+                        <input type="hidden" name="csrfmiddlewaretoken" value={csrfToken} />
+
+
+  {/* Include CSRF token as a hidden input field */}
+                        <input type="hidden" name="csrfmiddlewaretoken" value={csrfToken} />
+

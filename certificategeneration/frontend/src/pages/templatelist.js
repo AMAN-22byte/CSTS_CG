@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+
+
+
+function TemplateList() {
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  const handleFileChange = (event) => {
+    setSelectedOption({ type: 'file', value: event.target.files[0] });
+  };
+
+  const handleTemplateChange = (templateId) => {
+    setSelectedOption({ type: 'template', value: templateId });
+  };
+
+  const generateCertificate = (type) => {
+    if (selectedOption) {
+      const url = type === 'single'
+        ? `certgen?type=single&template_id=${selectedOption.value}`       // if
+        : `certgen?type=multiple&template_id=${selectedOption.value}`;    // else
+
+      // Redirect to the next page with the selected option
+      window.location.href = url;
+    } else {
+      alert("Please select a file or a template first.");
+    }
+  };
+
+  return (
+    <div className='template-list'>
+      <h1>Choose a Template</h1>
+
+      <div className='cert-image'>
+      <label htmlFor='user-temp' style={{cursor: 'pointer', color: 'black'}}>Upload Certificate Image</label>
+      <input type='file' id='user-temp'  onChange={handleFileChange} 
+       accept='image/*' 
+       disabled={selectedOption && selectedOption.type === 'template'}  />
+      </div>
+
+      <div className="template-options">
+        {[1, 2, 3, 4, 5].map(templateId => (
+          <div key={templateId}>
+            <input type='radio' id={`temp${templateId}`} name='template' className="template-radio" 
+              onChange={() => handleTemplateChange(templateId)} disabled={selectedOption && selectedOption.type === 'file'} />
+            <label htmlFor={`temp${templateId}`} className="template-label">
+              <img 
+                src={`https://i.pinimg.com/474x/${
+                        templateId === 1 ? '5d/b7/97/5db797d2bff4e37422a5f1aa439b4a58.jpg' 
+                      : templateId === 2 ? 'f3/91/2c/f3912cfafe632fa92f36850077a94613.jpg' 
+                      : templateId === 3 ? 'e6/6e/06/e66e063aa9e835abb01e81eb8fe7f5ad.jpg'
+                      : templateId === 4 ? 'b9/24/01/b92401d7d7851ea4ee59c6aaed11c5c5.jpg'
+                      : '71/16/2c/71162cc15ffb53edacd50a99751cd7b1.jpg'
+                    }`} 
+                alt={`Template ${templateId}`} 
+              />
+            </label>
+          </div>
+        ))}
+      </div>
+      <div className="button-container">
+        <button className="generate-single-button" onClick={() => generateCertificate('single')}>Generate single certificate</button>
+        <button className="generate-multiple-button" onClick={() => generateCertificate('multiple')}>Generate multiple certificates</button>
+      </div>
+    </div>  );
+}
+
+export default TemplateList;
+
+
+
+
+
